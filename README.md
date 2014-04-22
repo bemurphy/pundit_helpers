@@ -40,7 +40,7 @@ authorized?(post, :show?) # Returns true or false
 Also, this adds a `#can?` method ala CanCan.  Passing `can?` an action and record
 will return a boolean and is useful in views.  For example:
 
-```eruby
+```erb
 <% if can? :edit, @lesson %>
   <a href="/posts/42/edit">edit</a>
 <% end %>
