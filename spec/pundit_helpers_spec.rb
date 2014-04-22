@@ -2,11 +2,23 @@ require "pundit"
 require "pundit_helpers"
 
 class Harness
-  include PunditHelpers
+  def initialize
+    @helper_methods = []
+  end
 
   def current_user
     :spec_current_user
   end
+
+  def self.helper_methods
+    @helper_methods ||= []
+  end
+
+  def self.helper_method(name)
+    self.helper_methods << name
+  end
+
+  include PunditHelpers
 end
 
 describe PunditHelpers, "#authorized?" do
@@ -22,6 +34,10 @@ describe PunditHelpers, "#authorized?" do
     record = double
     expect(harness).to receive(:authorize).with(record, :show?).and_raise(Pundit::NotAuthorizedError)
     expect(harness.authorized?(record, :show?)).to be_false
+  end
+
+  it "is installed as a helper_method on module inclusion" do
+    expect(Harness.helper_methods).to include(:authorized?)
   end
 end
 
@@ -42,5 +58,9 @@ describe PunditHelpers, "#can?" do
 
     expect(Pundit).to receive(:policy!).with(:spec_current_user, record).and_return(policy)
     expect(harness.can?(:edit, record)).to be_false
+  end
+
+  it "is installed as a helper_method on module inclusion" do
+    expect(Harness.helper_methods).to include(:can?)
   end
 end

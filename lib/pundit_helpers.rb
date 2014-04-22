@@ -1,6 +1,17 @@
 require "pundit_helpers/version"
 
 module PunditHelpers
+  def self.included(base)
+    methods = [:authorized?, :can?]
+
+    if base.respond_to?(:helper_method)
+      methods.each { |m| base.helper_method(m) }
+    end
+
+    if respond_to?(:hide_action)
+      methods.each { |m| base.hide_action(m) }
+    end
+  end
   # Pundit's core `#authorize` helper always raises
   # an error, but also lets the controller know an authorization
   # has been performed.  Sometimes it is preferrable to flag that an
