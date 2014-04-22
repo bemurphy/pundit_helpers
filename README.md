@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-The helpers currently add a single `#authorized?` method that is useful
+The helpers currently add an `#authorized?` method that is useful
 for letting Pundit know that you have checked authorization so that the
 `verify_authorized` after filter doesn't raise an exception, and returns
 false for failures rather than raising.
@@ -35,6 +35,15 @@ false for failures rather than raising.
 ```ruby
 authorize(post, :show?) # Returns true or raises Pundit::NotAuthorized on failure
 authorized?(post, :show?) # Returns true or false
+```
+
+Also, this adds a `#can?` method ala CanCan.  Passing `can?` an action and record
+will return a boolean and is useful in views.  For example:
+
+```ruby
+<% if can? :edit, @lesson %>
+  <a href="/posts/42/edit">edit</a>
+<% end %>
 ```
 
 ## Contributing
