@@ -1,6 +1,6 @@
 # PunditHelpers
 
-Authorization helpers for Pundit
+Authorization helpers for [Pundit](https://github.com/elabs/pundit)
 
 ## Installation
 
