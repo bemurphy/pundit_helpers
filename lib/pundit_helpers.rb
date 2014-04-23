@@ -12,6 +12,7 @@ module PunditHelpers
       methods.each { |m| base.hide_action(m) }
     end
   end
+
   # Pundit's core `#authorize` helper always raises
   # an error, but also lets the controller know an authorization
   # has been performed.  Sometimes it is preferrable to flag that an
