@@ -6,8 +6,8 @@ class Harness
     @helper_methods = []
   end
 
-  def current_user
-    :spec_current_user
+  def pundit_user
+    :spec_pundit_user
   end
 
   def self.helper_methods
@@ -47,7 +47,7 @@ describe PunditHelpers, "#can?" do
     policy  = double(:edit? => true)
     harness = Harness.new
 
-    expect(Pundit).to receive(:policy!).with(:spec_current_user, record).and_return(policy)
+    expect(Pundit).to receive(:policy!).with(:spec_pundit_user, record).and_return(policy)
     expect(harness.can?(:edit, record)).to be_true
   end
 
@@ -56,7 +56,7 @@ describe PunditHelpers, "#can?" do
     policy  = double(:edit? => false)
     harness = Harness.new
 
-    expect(Pundit).to receive(:policy!).with(:spec_current_user, record).and_return(policy)
+    expect(Pundit).to receive(:policy!).with(:spec_pundit_user, record).and_return(policy)
     expect(harness.can?(:edit, record)).to be_false
   end
 

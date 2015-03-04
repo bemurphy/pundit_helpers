@@ -45,7 +45,7 @@ module PunditHelpers
   # @return [Boolean]
   def can?(query, record)
     query  = "#{query}?"
-    policy = Pundit.policy!(current_user, record)
+    policy = Pundit.policy!(pundit_user, record)
     !! policy.public_send(query)
   end
 end
