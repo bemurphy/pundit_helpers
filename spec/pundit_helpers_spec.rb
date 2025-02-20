@@ -21,46 +21,68 @@ class Harness
   include PunditHelpers
 end
 
-describe PunditHelpers, "#authorized?" do
-  it "is true if #authorize returns true" do
-    harness = Harness.new
-    record = double
-    expect(harness).to receive(:authorize).with(record, :show?).and_return(true)
-    expect(harness.authorized?(record, :show?)).to be_true
+class Post
+end
+
+class PostPolicy < Struct.new(:user, :post)
+  def edit?
+    user == :mr_joe
   end
 
-  it "is false if #authorize raises Pundit::NotAuthorizedError" do
-    harness = Harness.new
-    record = double
-    expect(harness).to receive(:authorize).with(record, :show?).and_raise(Pundit::NotAuthorizedError)
-    expect(harness.authorized?(record, :show?)).to be_false
-  end
-
-  it "is installed as a helper_method on module inclusion" do
-    expect(Harness.helper_methods).to include(:authorized?)
+  def show?
+    true
   end
 end
 
-describe PunditHelpers, "#can?" do
-  it "is true if the located policy permits the action" do
-    record  = double
-    policy  = double(:edit? => true)
-    harness = Harness.new
+describe PunditHelpers do
+  let(:harness) { Harness.new }
+  let(:record) { Post.new }
 
-    expect(Pundit).to receive(:policy!).with(:spec_pundit_user, record).and_return(policy)
-    expect(harness.can?(:edit, record)).to be_true
+  before do
+    allow(harness).to receive(:authorize).and_call_original
   end
 
-  it "is false if the located policy denies the action" do
-    record  = double
-    policy  = double(:edit? => false)
-    harness = Harness.new
+  describe "#authorized?" do
+    context "when authorization succeeds" do
+      it "is true if #authorize returns true" do
+        expect(harness.authorized?(record, :show?)).to eq true
+        expect(harness).to have_received(:authorize).with(record, :show?)
+      end
+    end
 
-    expect(Pundit).to receive(:policy!).with(:spec_pundit_user, record).and_return(policy)
-    expect(harness.can?(:edit, record)).to be_false
+    context "when authorization fails" do
+      it "is false if #authorize raises Pundit::NotAuthorizedError" do
+        expect(harness.authorized?(record, :edit?)).to be false
+        expect(harness).to have_received(:authorize).with(record, :edit?)
+      end
+    end
+
+    it "is installed as a helper_method on module inclusion" do
+      expect(Harness.helper_methods).to include(:authorized?)
+    end
   end
 
-  it "is installed as a helper_method on module inclusion" do
-    expect(Harness.helper_methods).to include(:can?)
+  describe "#can?" do
+    let(:policy) { PostPolicy.new(:spec_pundit_user, record) }
+
+    before do
+      allow(Pundit).to receive(:policy!)
+        .with(:spec_pundit_user, record)
+        .and_return(policy)
+    end
+
+    it "is true if the located policy permits the action" do
+      expect(harness.can?(:show, record)).to be true
+      expect(Pundit).to have_received(:policy!).with(:spec_pundit_user, record)
+    end
+
+    it "is false if the located policy denies the action" do
+      expect(harness.can?(:edit, record)).to be false
+      expect(Pundit).to have_received(:policy!).with(:spec_pundit_user, record)
+    end
+
+    it "is installed as a helper_method on module inclusion" do
+      expect(Harness.helper_methods).to include(:can?)
+    end
   end
 end
