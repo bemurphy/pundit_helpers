@@ -2,6 +2,10 @@ require "pundit_helpers/version"
 
 module PunditHelpers
   def self.included(base)
+    unless ancestors.include?(Pundit)
+      include Pundit::Authorization
+    end
+
     methods = [:authorized?, :can?]
 
     if base.respond_to?(:helper_method)
@@ -27,7 +31,7 @@ module PunditHelpers
   # @return [Boolean]
   def authorized?(record, query=nil)
     begin
-      authorize(record, query)
+      !!authorize(record, query)
     rescue Pundit::NotAuthorizedError
       false
     end
