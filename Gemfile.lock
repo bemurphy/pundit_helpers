@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pundit_helpers (1.0.0)
+    pundit_helpers (1.1.0)
       pundit (>= 0.2.2)
 
 GEM
